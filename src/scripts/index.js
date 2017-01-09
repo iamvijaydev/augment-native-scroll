@@ -1,10 +1,93 @@
-require("../scss/style.scss");
+require("../scss/styles.scss");
 import React from 'react';
 import {render} from 'react-dom';
 
-import Report from './Report';
+import SwipeToScroll from './SwipeToScroll';
 
 render(
-    <Report />,
+    <SwipeToScroll>
+        <ul className="block block--left">
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+        </ul>
+        <ul className="block block--right">
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+            <li>Hello World</li>
+        </ul>
+    </SwipeToScroll>,
     document.getElementById('app')
 );

@@ -1,6 +1,6 @@
 {
   "name": "native-scroll-wrapper",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Adding a wrapper over native scroll to extend scroll functionalities",
   "scripts": {
     "start": "node server.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vijay-stayntouch/augment-native-scroll"
+    "url": "https://github.com/iamvijaydev/augment-native-scroll"
   },
   "keywords": [
     "react",
@@ -20,12 +20,12 @@
     "edit",
     "webpack"
   ],
-  "author": "Vijay Dev <vijay-stayntouch@gmail.com> (http://github.com/vijay-stayntouch)",
+  "author": "Vijay Dev <vijaydev.in@gmail.com> (http://github.com/iamvijaydev)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/vijay-stayntouch/augment-native-scroll/issues"
+    "url": "https://github.com/iamvijaydev/augment-native-scroll/issues"
   },
-  "homepage": "https://github.com/vijay-stayntouch/augment-native-scroll",
+  "homepage": "https://github.com/iamvijaydev/augment-native-scroll",
   "devDependencies": {
     "babel-core": "^6.0.20",
     "babel-eslint": "^7.1.0",
