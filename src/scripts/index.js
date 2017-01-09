@@ -2,10 +2,10 @@ require("../scss/styles.scss");
 import React from 'react';
 import {render} from 'react-dom';
 
-import TouchToScroll from './TouchToScroll';
+import SwipeToScroll from './SwipeToScroll';
 
 render(
-    <TouchToScroll>
+    <SwipeToScroll>
         <ul className="block block--left">
             <li>Hello World</li>
             <li>Hello World</li>
@@ -88,6 +88,6 @@ render(
             <li>Hello World</li>
             <li>Hello World</li>
         </ul>
-    </TouchToScroll>,
+    </SwipeToScroll>,
     document.getElementById('app')
 );
