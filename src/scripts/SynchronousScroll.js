@@ -1,4 +1,5 @@
 import React, { Component, Children } from 'react';
+import { findMatchingTarget } from './utils.js'
 
 class SynchronousScroll extends Component {
     constructor(props) {
@@ -12,28 +13,11 @@ class SynchronousScroll extends Component {
         this.$activeNode = undefined;
 
         this.setActiveNode = this.setActiveNode.bind(this);
-        this.findTarget = this.findTarget.bind(this);
         this.onScrollHandler = this.onScrollHandler.bind(this);
     }
 
     setActiveNode(e) {
-        this.$activeNode = this.findTarget(e.target);
-    }
-
-    findTarget(target) {
-        if ( target.tagName === 'BODY' ) {
-            return 'BODY';
-        }
-
-        let found = this.childNodes.find(node => {
-            return node.id === target.id
-        });
-
-        if ( found ) {
-            return target.id;
-        } else {
-            return this.findTarget(target.parentElement);
-        }
+        this.$activeNode = findMatchingTarget(e.target, this.childNodes);
     }
 
     onScrollHandler(e) {
