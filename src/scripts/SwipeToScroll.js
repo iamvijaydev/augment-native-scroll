@@ -24,6 +24,8 @@ class SynchronousScroll extends Component {
 
         this.startX = 0;
         this.startY = 0;
+        this.lastX = 0;
+        this.lastY = 0;
         this.currX = 0;
         this.currY = 0;
 
@@ -39,8 +41,8 @@ class SynchronousScroll extends Component {
         this.didSwipe = false;
 
         let point = getPoint(e, this.hasTouch);
-        this.startX = point.x;
-        this.startY = point.y;
+        this.startX = this.lastX = point.x;
+        this.startY = this.lastY = point.y;
 
         this.$listener.addEventListener(
             this.MOVE_EVT,
@@ -55,35 +57,49 @@ class SynchronousScroll extends Component {
     }
 
     onTouchMove(e) {
+        let point, swipe;
+        const apply = (key, value) => {
+            this.childNodes.forEach(node => {
+                node.children[0][key] += value;
+
+                scrollValue = node.children[0][key];
+
+                correctedValue = scrollValue != 0 ? delta + scrollValue : delta;
+
+                node.children[0][key] = correctedValue
+            });
+        }
+
+        /**/
+
         if ( ! this.isTouching ) {
             return;
         }
 
+        this.didSwipe = true;
         e.preventDefault();
 
-        let point = getPoint(e, this.hasTouch);
-        this.curX     = point.x;
-        this.curY     = point.y;
-        this.didSwipe = true;
-
-        let swipe = computeSwipe({
-            startX: this.startX,
-            curX: this.curX,
-            curY: this.curY,
-            startY: this.startY
+        point = getPoint(e, this.hasTouch);
+        swipe = computeSwipe({
+            startX: this.lastX,
+            curX: point.x,
+            curY: point.y,
+            startY: this.lastY
         });
-
-        const apply = (key, value) => {
-            this.childNodes.forEach(node => {
-                node.children[0][key] += value;
-            });
+        if ( swipe.deltaY > 45 ) {
+            this.lastY = point.y
+        }
+        if ( swipe.deltaX > 45 ) {
+            this.lastX = point.x
         }
 
-        if ( swipe.direction === UP || swipe.direction === DOWN ) {
-            apply('scrollTop', swipe.deltaY);
-        } else if ( swipe.direction === LEFT || swipe.direction === RIGHT ) {
-            apply('scrollLeft', swipe.deltaX);
-        }
+        // if ( swipe.direction === UP || swipe.direction === DOWN ) {
+        //     apply('scrollTop', swipe.deltaY);
+        // } else if ( swipe.direction === LEFT || swipe.direction === RIGHT ) {
+        //     apply('scrollLeft', swipe.deltaX);
+        // }
+
+        var deltaX = point.x - this.startX;
     }
 
     onTouchEnd(e) {
