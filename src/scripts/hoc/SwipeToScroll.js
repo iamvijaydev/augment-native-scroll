@@ -58,16 +58,11 @@ class SynchronousScroll extends Component {
         this.startX = this.lastX = point.x;
         this.startY = this.lastY = point.y;
 
-        this.$listener.addEventListener(
-            this.MOVE_EVT,
-            this.onTouchMove,
-            true
-        );
-        this.$listener.addEventListener(
-            this.END_EVT,
-            this.onTouchEnd,
-            true
-        );
+        this.$listener.removeEventListener( this.MOVE_EVT, this.onTouchMove );
+        this.$listener.addEventListener( this.MOVE_EVT, this.onTouchMove, true );
+
+        this.$listener.removeEventListener( this.END_EVT, this.onTouchEnd );
+        this.$listener.addEventListener( this.END_EVT, this.onTouchEnd, true );
     }
 
     onTouchMove(e) {
@@ -114,8 +109,8 @@ class SynchronousScroll extends Component {
         deltaY = point.y - this.lastY;
         deltaX = point.x - this.lastX;
 
-        apply('scrollTop', deltaY);
-        apply('scrollLeft', deltaX);
+        apply('scrollTop', -deltaY);
+        apply('scrollLeft', -deltaX);
 
         this.lastY = point.y;
         this.lastX = point.x;
