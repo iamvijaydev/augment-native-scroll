@@ -140,19 +140,18 @@ class SynchronousScroll extends Component {
             from = this.currentYPos;
         }
 
-        // TODO: Need to fix calcuation errors
-        // let kinetics = computeKinetics(
-        //     from,
-        //     swipe.direction,
-        //     diff,
-        //     Date.parse( new Date() ) - this.touchStartTime
-        // );
-        // this.doAnimation(
-        //     swipe.direction,
-        //     kinetics.from,
-        //     kinetics.to,
-        //     kinetics.duration
-        // )
+        let kinetics = computeKinetics(
+            from,
+            swipe.direction,
+            diff,
+            Date.parse( new Date() ) - this.startTime
+        );
+        this.doAnimation(
+            swipe.direction,
+            kinetics.from,
+            kinetics.to,
+            kinetics.duration
+        )
 
         /* clean up */
         this.isTouching = false;
@@ -171,20 +170,21 @@ class SynchronousScroll extends Component {
         let currentTime = 0;
         let scrollKey;
 
-        const animate = () => {
+        const animate = (timestamp) => {
             delta = easeOutQuint(currentTime, from, diff, duration);
 
             if ( direction === LEFT || direction === UP ) {
                 scrollKey = 'scrollLeft';
-                //this.currentXPos = delta;
+                this.currentXPos = delta;
             } else {
                 scrollKey = 'scrollTop';
-                //this.currentYPos = delta;
+                this.currentYPos = delta;
             }
             this.childNodes.forEach(node => {
                 node.children[0][scrollKey] = delta;
             });
 
+            console.log(timestamp);
             if(duration > currentTime) {
                 this.loop = callRaf(animate);
                 this.isAnimating = true;
@@ -194,21 +194,20 @@ class SynchronousScroll extends Component {
             }
 
             currentTime += 20;
-        };
+        }
 
-        animate();
+        callRaf(animate);
     }
 
     componentDidMount() {
         this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );
+        this.v = document.getElementById('v');
     }
 
     componentWillUnmount() {
         this.$listener.removeEventListener( this.START_EVT, this.onTouchStart );
     }
-    componentWillReceiveProps(nextProp){
 
-    }
     render() {
         return (
             <span ref={

@@ -80,10 +80,10 @@ export function computeKinetics (from, direction, swipeLength, swipeDuration) {
 
     // direction is left or up
     if(direction === LEFT || direction === UP) {
-        to = from - resultingDisplacement;
+        to = from + resultingDisplacement;
     // direction is right or down
     } else {
-        to = from + resultingDisplacement;
+        to = from - resultingDisplacement;
     }
 
     return {
