@@ -9,7 +9,7 @@ import {
     easeOutQuint,
     LEFT,
     UP
-} from './utils.js'
+} from '../utils.js'
 
 class SynchronousScroll extends Component {
     constructor(props) {
@@ -76,9 +76,9 @@ class SynchronousScroll extends Component {
             let corrected;
 
             if ( 'scrollLeft' === key ) {
-                corrected = this.currentXPos !== 0 ? delta + this.currentXPos : delta;
+                corrected = this.currentXPos !== 0 ? this.currentXPos + delta : delta;
             } else {
-                corrected = this.currentYPos !== 0 ? delta + this.currentYPos : delta;
+                corrected = this.currentYPos !== 0 ? this.currentYPos + delta : delta;
             }
 
             if ( corrected < 0 ) {
@@ -99,7 +99,7 @@ class SynchronousScroll extends Component {
         /**/
 
         // if animating due to momentum from previous swiping
-        if( this.isAnimating ) {
+        if ( this.isAnimating ) {
             cancelRaf(this.loop);
         }
 
@@ -122,9 +122,9 @@ class SynchronousScroll extends Component {
     }
 
     onTouchEnd(e) {
-        if( ! this.didSwipe ) {
+        if ( ! this.didSwipe ) {
             return;
-        };
+        }
 
         e.preventDefault();
 

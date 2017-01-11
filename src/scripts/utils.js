@@ -10,7 +10,7 @@ export function findMatchingTarget(target = {}, nodes = []) {
     if ( found ) {
         return target.id;
     } else {
-        return findMatchingTarget(target.parentElement);
+        return findMatchingTarget(target.parentElement, nodes);
     }
 }
 
@@ -122,4 +122,26 @@ export function easeOutExpo (t, b, c, d) {
 
 export function easeOutSine (t, b, c, d) {
     return c * Math.sin( t / d * (Math.PI / 2) ) + b;
+}
+
+export function generateData () {
+    let list = [];
+    let table = [];
+    let row;
+
+    for( let i = 0; i < 70; i++ ) {
+        list.push( Math.random().toString(36).substring(7) );
+
+        row = [];
+        for( let j = 0; j < 100; j++ ){
+            row.push( Math.floor(Math.random() * 16) + 5 );
+        }
+
+        table.push(row);
+    }
+
+    return {
+        list,
+        table
+    }
 }
