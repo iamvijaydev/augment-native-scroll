@@ -9,6 +9,7 @@ class App extends Component {
                     <nav>
                         <ul className="nav nav-pills pull-right">
                             <li role="presentation"><a href="https://github.com/iamvijaydev/augment-native-scroll">GitHub</a></li>
+                            <li role="presentation"><a href="https://github.com/iamvijaydev/augment-native-scroll/issues">Issues</a></li>
                         </ul>
                     </nav>
                     <h3 className="text-muted">Augment Native Scroll</h3>
