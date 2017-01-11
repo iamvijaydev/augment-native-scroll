@@ -4,19 +4,26 @@ var webpack = require('webpack');
 module.exports = {
     devtool: 'cheap-module-source-map',
     entry: [
-        'react-hot-loader/patch',
-        'webpack-hot-middleware/client',
         './src/scripts/index'
     ],
     output: {
         path: path.join(__dirname, 'dist'),
         filename: 'bundle.js',
-        publicPath: '/dist/'
+        publicPath: '/'
     },
     plugins: [
         new webpack.optimize.OccurenceOrderPlugin(),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NoErrorsPlugin(),
+        new webpack.optimize.UglifyJsPlugin({
+            compressor: {
+                warnings: false,
+                screw_ie8: true
+            }
+        }),
+        new webpack.DefinePlugin({
+            'process.env': {
+                'NODE_ENV': JSON.stringify('production')
+            }
+        })
     ],
     module: {
         loaders: [{
