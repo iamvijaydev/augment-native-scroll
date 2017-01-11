@@ -3,10 +3,12 @@ import {
     findMatchingTarget,
     getPoint,
     computeSwipe,
+    computeKinetics,
+    callRaf,
+    cancelRaf,
+    easeOutQuint,
     LEFT,
-    RIGHT,
-    UP,
-    DOWN
+    UP
 } from './utils.js'
 
 class SynchronousScroll extends Component {
@@ -22,6 +24,16 @@ class SynchronousScroll extends Component {
         this.childNodes = [];
         this.$activeNode = undefined;
 
+        this.currentXPos = 0;
+        this.currentYPos = 0;
+
+        this.isTouching = false;
+        this.didSwipe = false;
+
+        this.isAnimating = false;
+        this.loop = null;
+
+        this.startTime = 0;
         this.startX = 0;
         this.startY = 0;
         this.lastX = 0;
@@ -32,6 +44,7 @@ class SynchronousScroll extends Component {
         this.onTouchStart = this.onTouchStart.bind(this);
         this.onTouchMove = this.onTouchMove.bind(this);
         this.onTouchEnd = this.onTouchEnd.bind(this);
+        this.doAnimation = this.doAnimation.bind(this);
     }
 
     onTouchStart(e) {
@@ -39,6 +52,7 @@ class SynchronousScroll extends Component {
 
         this.isTouching = true;
         this.didSwipe = false;
+        this.startTime = Date.parse(new Date());
 
         let point = getPoint(e, this.hasTouch);
         this.startX = this.lastX = point.x;
@@ -57,20 +71,37 @@ class SynchronousScroll extends Component {
     }
 
     onTouchMove(e) {
-        let point, swipe;
-        const apply = (key, value) => {
+        let point, deltaY, deltaX;
+        const apply = (key, delta) => {
+            let corrected;
+
+            if ( 'scrollLeft' === key ) {
+                corrected = this.currentXPos !== 0 ? delta + this.currentXPos : delta;
+            } else {
+                corrected = this.currentYPos !== 0 ? delta + this.currentYPos : delta;
+            }
+
+            if ( corrected < 0 ) {
+                return;
+            }
+
             this.childNodes.forEach(node => {
-                node.children[0][key] += value;
-
-                scrollValue = node.children[0][key];
-
-                correctedValue = scrollValue != 0 ? delta + scrollValue : delta;
-
-                node.children[0][key] = correctedValue
+                node.children[0][key] = corrected;
             });
+
+            if ( 'scrollLeft' === key ) {
+                this.currentXPos = corrected;
+            } else {
+                this.currentYPos = corrected;
+            }
         }
 
         /**/
+
+        // if animating due to momentum from previous swiping
+        if( this.isAnimating ) {
+            cancelRaf(this.loop);
+        }
 
         if ( ! this.isTouching ) {
             return;
@@ -80,26 +111,14 @@ class SynchronousScroll extends Component {
         e.preventDefault();
 
         point = getPoint(e, this.hasTouch);
-        swipe = computeSwipe({
-            startX: this.lastX,
-            curX: point.x,
-            curY: point.y,
-            startY: this.lastY
-        });
-        if ( swipe.deltaY > 45 ) {
-            this.lastY = point.y
-        }
-        if ( swipe.deltaX > 45 ) {
-            this.lastX = point.x
-        }
+        deltaY = point.y - this.lastY;
+        deltaX = point.x - this.lastX;
 
-        // if ( swipe.direction === UP || swipe.direction === DOWN ) {
-        //     apply('scrollTop', swipe.deltaY);
-        // } else if ( swipe.direction === LEFT || swipe.direction === RIGHT ) {
-        //     apply('scrollLeft', swipe.deltaX);
-        // }
+        apply('scrollTop', deltaY);
+        apply('scrollLeft', deltaX);
 
-        var deltaX = point.x - this.startX;
+        this.lastY = point.y;
+        this.lastX = point.x;
     }
 
     onTouchEnd(e) {
@@ -109,16 +128,81 @@ class SynchronousScroll extends Component {
 
         e.preventDefault();
 
+        let point = getPoint(e, this.hasTouch);
+        let swipe = computeSwipe({
+            startX: this.startX,
+            curX: point.x,
+            startY: this.startY,
+            curY: point.y
+        });
+
+        let diff, from;
+        if ( swipe.direction === LEFT || swipe.direction === UP ) {
+            diff = swipe.diffX;
+            from = this.currentXPos;
+        } else {
+            diff = swipe.diffY;
+            from = this.currentYPos;
+        }
+
+        // TODO: Need to fix calcuation errors
+        // let kinetics = computeKinetics(
+        //     from,
+        //     swipe.direction,
+        //     diff,
+        //     Date.parse( new Date() ) - this.touchStartTime
+        // );
+        // this.doAnimation(
+        //     swipe.direction,
+        //     kinetics.from,
+        //     kinetics.to,
+        //     kinetics.duration
+        // )
+
         /* clean up */
         this.isTouching = false;
         this.didSwipe = false;
         this.startX = 0;
         this.startY = 0;
-        this.currX = 0;
-        this.currY = 0;
+        this.lastX = 0;
+        this.lastY = 0;
         this.$listener.removeEventListener( this.MOVE_EVT, this.onTouchMove );
         this.$listener.removeEventListener( this.END_EVT, this.onTouchEnd );
-    };
+    }
+
+    doAnimation(direction, from, to, duration) {
+        let delta = 0;
+        let diff = to - from;
+        let currentTime = 0;
+        let scrollKey;
+
+        const animate = () => {
+            delta = easeOutQuint(currentTime, from, diff, duration);
+
+            if ( direction === LEFT || direction === UP ) {
+                scrollKey = 'scrollLeft';
+                //this.currentXPos = delta;
+            } else {
+                scrollKey = 'scrollTop';
+                //this.currentYPos = delta;
+            }
+            this.childNodes.forEach(node => {
+                node.children[0][scrollKey] = delta;
+            });
+
+            if(duration > currentTime) {
+                this.loop = callRaf(animate);
+                this.isAnimating = true;
+            } else {
+                cancelRaf(this.loop);
+                this.isAnimating = false;
+            }
+
+            currentTime += 20;
+        };
+
+        animate();
+    }
 
     componentDidMount() {
         this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );

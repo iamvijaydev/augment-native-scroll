@@ -16,12 +16,12 @@ class App extends Component {
             <SwipeToScroll>
                 <ul className="block block--left">
                     {
-                        items.map((item, i) => <li>Hello World</li>)
+                        items.map((item, i) => <li key={i}>Hello World</li>)
                     }
                 </ul>
                 <ul className="block block--right">
                     {
-                        items.map((item, i) => <li>Hello World</li>)
+                        items.map((item, i) => <li key={i}>Hello World</li>)
                     }
                 </ul>
             </SwipeToScroll>

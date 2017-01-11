@@ -37,9 +37,9 @@ export const RIGHT = 'RIGHT'
 export const UP = 'UP'
 export const DOWN = 'DOWN'
 export function computeSwipe(options) {
-    let deltaX     = options.startX - options.curX;
-    let deltaY     = options.curY - options.startY;
-    let radius     = Math.atan2( deltaY, deltaX );
+    let diffX = options.startX - options.curX;
+    let diffY = options.curY - options.startY;
+    let radius = Math.atan2( diffY, diffX );
     let swipeAngle = Math.round( radius * 180 / Math.PI );
 
     if ( swipeAngle < 0 ) {
@@ -61,8 +61,65 @@ export function computeSwipe(options) {
     };
 
     return {
-        deltaX,
-        deltaY,
+        diffX,
+        diffY,
         direction
     }
 }
+
+export function computeKinetics (from, direction, swipeLength, swipeDuration) {
+    var deceleration = 0.0006;
+
+    var swipeDuration = Math.max(swipeDuration, 200);
+    var speed = swipeLength / swipeDuration;
+
+    var resultingDisplacement = (speed * speed) / (2 * deceleration);
+    var duration = speed / deceleration;
+
+    var to = 0;
+
+    // direction is left or up
+    if(direction === LEFT || direction === UP) {
+        to = from - resultingDisplacement;
+    // direction is right or down
+    } else {
+        to = from + resultingDisplacement;
+    }
+
+    return {
+        from,
+        to,
+        duration
+    }
+};
+
+export const callRaf = (function () {
+    return window.requestAnimationFrame ||
+        window.webkitRequestAnimationFrame ||
+        window.mozRequestAnimationFrame ||
+        window.oRequestAnimationFrame ||
+        window.msRequestAnimationFrame ||
+        function(callback) { return setTimeout(callback, 1); };
+})();
+
+export const cancelRaf = (function () {
+    return window.cancelRequestAnimationFrame ||
+        window.webkitCancelAnimationFrame ||
+        window.webkitCancelRequestAnimationFrame ||
+        window.mozCancelRequestAnimationFrame ||
+        window.oCancelRequestAnimationFrame ||
+        window.msCancelRequestAnimationFrame ||
+        clearTimeout;
+})();
+
+export function easeOutQuint (t, b, c, d) {
+    return c * ( (t = t / d - 1) * t * t * t * t + 1 ) + b;
+};
+
+export function easeOutExpo (t, b, c, d) {
+    return (t == d) ? b + c : c * ( -Math.pow(2, -10 * t / d) + 1 ) + b;
+};
+
+export function easeOutSine (t, b, c, d) {
+    return c * Math.sin( t / d * (Math.PI / 2) ) + b;
+};
