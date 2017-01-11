@@ -4,8 +4,6 @@ import {
     getPoint,
     computeSwipe,
     computeKinetics,
-    callRaf,
-    cancelRaf,
     easeOutQuint,
     LEFT,
     UP
@@ -95,7 +93,8 @@ class SynchronousScroll extends Component {
 
         // if animating due to momentum from previous swiping
         if ( this.isAnimating ) {
-            cancelRaf(this.loop);
+            window.cancelAnimationFrame(this.loop);
+            this.loop = null;
         }
 
         if ( ! this.isTouching ) {
@@ -165,13 +164,17 @@ class SynchronousScroll extends Component {
     }
 
     doAnimation(direction, from, to, duration) {
-        let delta = 0;
         let diff = to - from;
-        let currentTime = 0;
         let scrollKey;
 
+        let start, progress, delta;
         const animate = (timestamp) => {
-            delta = easeOutQuint(currentTime, from, diff, duration);
+            if ( ! start ) {
+                start = timestamp;
+            }
+
+            progress = timestamp - start;
+            delta = easeOutQuint(progress, from, diff, duration);
 
             if ( direction === LEFT || direction === UP ) {
                 scrollKey = 'scrollLeft';
@@ -184,19 +187,19 @@ class SynchronousScroll extends Component {
                 node.children[0][scrollKey] = delta;
             });
 
-            console.log(timestamp);
-            if(duration > currentTime) {
-                this.loop = callRaf(animate);
+            if ( duration > progress ) {
+                if ( this.loop === null ) {
+                    this.loop = window.requestAnimationFrame(animate);
+                } else {
+                    window.requestAnimationFrame(animate);
+                }
                 this.isAnimating = true;
             } else {
-                cancelRaf(this.loop);
                 this.isAnimating = false;
             }
-
-            currentTime += 20;
         }
 
-        callRaf(animate);
+        window.requestAnimationFrame(animate);
     }
 
     componentDidMount() {

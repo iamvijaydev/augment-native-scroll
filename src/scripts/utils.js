@@ -93,25 +93,6 @@ export function computeKinetics (from, direction, swipeLength, swipeDuration) {
     }
 }
 
-export const callRaf = (function () {
-    return window.requestAnimationFrame ||
-        window.webkitRequestAnimationFrame ||
-        window.mozRequestAnimationFrame ||
-        window.oRequestAnimationFrame ||
-        window.msRequestAnimationFrame ||
-        function(callback) { return setTimeout(callback, 1); };
-})();
-
-export const cancelRaf = (function () {
-    return window.cancelRequestAnimationFrame ||
-        window.webkitCancelAnimationFrame ||
-        window.webkitCancelRequestAnimationFrame ||
-        window.mozCancelRequestAnimationFrame ||
-        window.oCancelRequestAnimationFrame ||
-        window.msCancelRequestAnimationFrame ||
-        clearTimeout;
-})();
-
 export function easeOutQuint (t, b, c, d) {
     return c * ( (t = t / d - 1) * t * t * t * t + 1 ) + b;
 }
