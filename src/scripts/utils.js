@@ -27,7 +27,7 @@ export function getPoint(e, hasTouch) {
             'x' : event.clientX,
             'y' : event.clientY
         }
-    };
+    }
 
     return point;
 }
@@ -44,7 +44,7 @@ export function computeSwipe(options) {
 
     if ( swipeAngle < 0 ) {
         swipeAngle = 360 - Math.abs(swipeAngle);
-    };
+    }
 
     let direction = null;
 
@@ -58,7 +58,7 @@ export function computeSwipe(options) {
         direction = DOWN;
     } else {
         direction = UP;
-    };
+    }
 
     return {
         diffX,
@@ -91,7 +91,7 @@ export function computeKinetics (from, direction, swipeLength, swipeDuration) {
         to,
         duration
     }
-};
+}
 
 export const callRaf = (function () {
     return window.requestAnimationFrame ||
@@ -114,12 +114,12 @@ export const cancelRaf = (function () {
 
 export function easeOutQuint (t, b, c, d) {
     return c * ( (t = t / d - 1) * t * t * t * t + 1 ) + b;
-};
+}
 
 export function easeOutExpo (t, b, c, d) {
     return (t == d) ? b + c : c * ( -Math.pow(2, -10 * t / d) + 1 ) + b;
-};
+}
 
 export function easeOutSine (t, b, c, d) {
     return c * Math.sin( t / d * (Math.PI / 2) ) + b;
-};
+}
