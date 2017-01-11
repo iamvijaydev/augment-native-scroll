@@ -1,93 +1,17 @@
-require("../scss/styles.scss");
+require('../scss/styles.scss');
 import React from 'react';
-import {render} from 'react-dom';
+import { render } from 'react-dom';
+import { Router, Route, browserHistory } from 'react-router'
 
-import SwipeToScroll from './SwipeToScroll';
+import App from './components/App';
+import SynchronousScrollExample from './components/SynchronousScrollExample.js';
+import SwipeToScrollExmple from './components/SwipeToScrollExample.js';
 
 render(
-    <SwipeToScroll>
-        <ul className="block block--left">
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-        </ul>
-        <ul className="block block--right">
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-            <li>Hello World</li>
-        </ul>
-    </SwipeToScroll>,
+    <Router history={browserHistory}>
+        <Route path="/" component={App}/>
+        <Route path="/synchronous-scroll" component={SynchronousScrollExample}/>
+        <Route path="/swipe-to-scroll" component={SwipeToScrollExmple}/>
+    </Router>,
     document.getElementById('app')
 );

@@ -1,6 +1,6 @@
 {
   "name": "native-scroll-wrapper",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Adding a wrapper over native scroll to extend scroll functionalities",
   "scripts": {
     "start": "node server.js",
@@ -35,7 +35,10 @@
     "babel-preset-stage-0": "^6.0.15",
     "css-loader": "^0.26.1",
     "eslint": "^3.9.1",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-react": "^6.5.0",
+    "eslint-plugin-standard": "^2.0.1",
     "express": "^4.13.4",
     "node-sass": "^4.1.1",
     "sass-loader": "^4.1.1",
@@ -47,6 +50,7 @@
   "dependencies": {
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
-    "react-hot-loader": "^3.0.0-beta.6"
+    "react-hot-loader": "^3.0.0-beta.6",
+    "react-router": "^3.0.0"
   }
 }
