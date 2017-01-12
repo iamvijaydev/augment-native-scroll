@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react';
+import React, { Component, Children, PropTypes } from 'react';
 import {
     findMatchingTarget,
     getPoint,
@@ -271,6 +271,10 @@ class SynchronousScrollSwipe extends Component {
             </span>
         )
     }
+}
+
+SynchronousScrollSwipe.propTypes = {
+    children: PropTypes.element.isRequired
 }
 
 export default SynchronousScrollSwipe;

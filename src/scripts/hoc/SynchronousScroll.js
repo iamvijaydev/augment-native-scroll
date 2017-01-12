@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react';
+import React, { Component, Children, PropTypes } from 'react';
 import { findMatchingTarget } from '../utils.js'
 
 class SynchronousScroll extends Component {
@@ -65,6 +65,10 @@ class SynchronousScroll extends Component {
             </span>
         )
     }
+}
+
+SynchronousScroll.propTypes = {
+    children: PropTypes.element.isRequired
 }
 
 export default SynchronousScroll;

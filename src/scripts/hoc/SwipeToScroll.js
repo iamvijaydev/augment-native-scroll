@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react';
+import React, { Component, Children, PropTypes } from 'react';
 import {
     getPoint,
     computeSwipe,
@@ -8,7 +8,7 @@ import {
     RIGHT
 } from '../utils.js'
 
-class SynchronousScroll extends Component {
+class SwipeToScroll extends Component {
     constructor(props) {
         super(props);
 
@@ -252,4 +252,8 @@ class SynchronousScroll extends Component {
     }
 }
 
-export default SynchronousScroll;
+SwipeToScroll.propTypes = {
+    children: PropTypes.element.isRequired
+}
+
+export default SwipeToScroll;
