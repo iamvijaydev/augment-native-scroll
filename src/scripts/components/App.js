@@ -22,15 +22,15 @@ class App extends Component {
                 </div>
 
                 <div className="row marketing">
-                    <h4>Synchronous Scroll</h4>
+                    <h4>Synchronous Scroll <span className="mute">(mouse and keyboard scroll)</span></h4>
                     <p>Related scrollable areas scroll as one when anyone of them is scrolled via mouse or keyboard. This is primarily focused for non-touch devices</p>
                     <p><Link to='/synchronous-scroll' activeClassName='active'>Demo</Link></p>
 
-                    <h4>Swipe to Scroll</h4>
+                    <h4>Swipe to Scroll <span className="mute">(tap/click-hold swipe)</span></h4>
                     <p>Related scrollable areas can be scrolled via swipe or on non-touch devices mimicking the same via mouse. This is primarily focused for bring touch like features to non-touch devices</p>
                     <p><Link to='/swipe-to-scroll' activeClassName='active'>Demo</Link></p>
 
-                    <h4>Both</h4>
+                    <h4>Both <span className="mute">(both ways)</span></h4>
                     <p>Both the scrolling feature working together smoothly</p>
                     <p><a href="">TBD</a></p>
                 </div>
