@@ -14,6 +14,7 @@ class SynchronousScrollSwipe extends Component {
         super(props);
 
         this.hasTouch = 'ontouchstart' in window;
+        this.DETECT_EVT = this.hasTouch ? 'touchstart' : 'mouseover';
         this.START_EVT = this.hasTouch ? 'touchstart' : 'mousedown';
         this.MOVE_EVT  = this.hasTouch ? 'touchmove' : 'mousemove';
         this.END_EVT   = this.hasTouch ? 'touchend' : 'mouseup';
@@ -230,21 +231,21 @@ class SynchronousScrollSwipe extends Component {
     }
 
     componentDidMount() {
-        this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );
+        this.$listener.addEventListener( this.DETECT_EVT, this.setActiveNode, true );
+        this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
 
         if ( ! this.hasTouch ) {
-            this.$listener.addEventListener( 'mouseover', this.setActiveNode, true );
+            this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );
         }
-        this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
     }
 
     componentWillUnmount() {
-        this.$listener.removeEventListener( this.START_EVT, this.onTouchStart );
+        this.$listener.removeEventListener( this.DETECT_EVT, this.setActiveNode );
+        this.$listener.removeEventListener( 'scroll', this.onScrollHandler );
 
         if ( ! this.hasTouch ) {
-            this.$listener.removeEventListener( 'mouseover', this.setActiveNode );
+            this.$listener.removeEventListener( this.START_EVT, this.onTouchStart );
         }
-        this.$listener.removeEventListener( 'scroll', this.onScrollHandler );
     }
 
     render() {
