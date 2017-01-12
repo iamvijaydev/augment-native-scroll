@@ -1,11 +1,10 @@
 # Augment Native Scroll
-Experiments with custom wrappers over native scroll for higher functions
+Experiments with custom wrappers over native scroll to achieve higher order functions
 
-### Aim
-The aim of this project is to experiment with custom wrappers over native scroll to achieve higher functionality. The prime feature is about synchronous scroll, where multiple scrollable areas, scroll as one when anyone of them is scrolled. The demos are step to test them on UIWebView (iOS) and determine the best way we can achieve the desired result.
+### Objective
+Primary objective is to have multiple (related) scrollable areas, scroll as one, when anyone of them is scrolled. The demos are step up to test them on UIWebView (iOS) and determine the best way we can achieve the desired results. There are three different implemented flavors of native scrolls listed below:
 
 ### Synchronous Scroll
-
 _mouse and keyboard scroll_
 
 Related scrollable areas scroll as one when anyone of them is scrolled via mouse or keyboard. This is primarily focused for non-touch devices.
@@ -20,9 +19,8 @@ Related scrollable areas can be scrolled via swipe or on non-touch devices mimic
 [Demo](https://iamvijaydev.github.io/augment-native-scroll/#/swipe-to-scroll)
 
 ### Both
-
-_both ways_
+_both flavors_
 
 Both the scrolling feature working together smoothly.
 
-[TBD](https://iamvijaydev.github.io/augment-native-scroll/)
+[Demo](https://iamvijaydev.github.io/augment-native-scroll/#/synchronous-scroll-swipe)

@@ -16,9 +16,9 @@ class App extends Component {
                 </div>
 
                 <div className="jumbotron">
-                    <p className="lead">The aim of this project is to experiment with custom wrappers over native scroll to achieve higher functionality.</p>
-                    <p className="lead">The prime feature is about synchronous scroll, where multiple scrollable areas, scroll as one when anyone of them is scrolled.</p>
-                    <p className="lead">The demos are step to test them on UIWebView (iOS) and determine the best way we can achieve the desired result.</p>
+                    <p className="lead">Primary objective is to have multiple (related) scrollable areas, scroll as one, when anyone of them is scrolled.</p>
+                    <p className="lead">The demos are step up to test them on UIWebView (iOS) and determine the best way we can achieve the desired results.</p>
+                    <p className="lead">There are three different implemented flavors of native scrolls listed below.</p>
                 </div>
 
                 <div className="row marketing">
@@ -30,7 +30,7 @@ class App extends Component {
                     <p>Related scrollable areas can be scrolled via swipe or on non-touch devices mimicking the same via mouse. This is primarily focused for bring touch like features to non-touch devices</p>
                     <p><Link to='/swipe-to-scroll' activeClassName='active'>Demo</Link></p>
 
-                    <h4>Both <span className="mute">(both ways)</span></h4>
+                    <h4>Both <span className="mute">(both flavors)</span></h4>
                     <p>Both the scrolling feature working together smoothly</p>
                     <p><Link to='/synchronous-scroll-swipe' activeClassName='active'>Demo</Link></p>
                 </div>
