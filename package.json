@@ -1,6 +1,6 @@
 {
   "name": "native-scroll-wrapper",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Adding a wrapper over native scroll to extend scroll functionalities",
   "scripts": {
     "start": "node server.js",
