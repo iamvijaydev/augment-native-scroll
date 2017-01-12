@@ -34,13 +34,25 @@ class SynchronousScroll extends Component {
         this.startY = 0;
         this.lastX = 0;
         this.lastY = 0;
-        this.currX = 0;
-        this.currY = 0;
 
+        this.onScrollHandler = this.onScrollHandler.bind(this);
         this.onTouchStart = this.onTouchStart.bind(this);
         this.onTouchMove = this.onTouchMove.bind(this);
         this.onTouchEnd = this.onTouchEnd.bind(this);
         this.doAnimation = this.doAnimation.bind(this);
+    }
+
+    // prevent other scroll methods
+    onScrollHandler(e) {
+        if ( this.isTouching || this.isAnimating ) {
+            e.preventDefault();
+            return;
+        }
+
+        this.childNodes.forEach(node => {
+            node.children[0].scrollTop = this.currentYPos;
+            node.children[0].scrollLeft = this.currentXPos;
+        });
     }
 
     onTouchStart(e) {
@@ -207,10 +219,12 @@ class SynchronousScroll extends Component {
 
     componentDidMount() {
         this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );
+        this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
     }
 
     componentWillUnmount() {
         this.$listener.removeEventListener( this.START_EVT, this.onTouchStart );
+        this.$listener.removeEventListener( 'scroll', this.onScrollHandler );
     }
 
     render() {

@@ -36,8 +36,6 @@ class SynchronousScrollSwipe extends Component {
         this.startY = 0;
         this.lastX = 0;
         this.lastY = 0;
-        this.currX = 0;
-        this.currY = 0;
 
         this.setActiveNode = this.setActiveNode.bind(this);
         this.onScrollHandler = this.onScrollHandler.bind(this);
