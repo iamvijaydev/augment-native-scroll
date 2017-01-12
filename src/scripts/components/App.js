@@ -32,7 +32,7 @@ class App extends Component {
 
                     <h4>Both <span className="mute">(both ways)</span></h4>
                     <p>Both the scrolling feature working together smoothly</p>
-                    <p><a href="">TBD</a></p>
+                    <p><Link to='/synchronous-scroll-swipe' activeClassName='active'>Demo</Link></p>
                 </div>
 
                 <footer className="footer">

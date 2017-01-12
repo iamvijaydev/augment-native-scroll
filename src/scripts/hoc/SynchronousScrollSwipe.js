@@ -1,14 +1,15 @@
 import React, { Component, Children } from 'react';
 import {
+    findMatchingTarget,
     getPoint,
     computeSwipe,
     computeKinetics,
     easeOutQuint,
     LEFT,
-    RIGHT
+    RIGHT,
 } from '../utils.js'
 
-class SynchronousScroll extends Component {
+class SynchronousScrollSwipe extends Component {
     constructor(props) {
         super(props);
 
@@ -19,6 +20,7 @@ class SynchronousScroll extends Component {
 
         this.$listener = undefined;
         this.childNodes = [];
+        this.$activeNode = undefined;
 
         this.currentXPos = 0;
         this.currentYPos = 0;
@@ -37,13 +39,42 @@ class SynchronousScroll extends Component {
         this.currX = 0;
         this.currY = 0;
 
+        this.setActiveNode = this.setActiveNode.bind(this);
+        this.onScrollHandler = this.onScrollHandler.bind(this);
         this.onTouchStart = this.onTouchStart.bind(this);
         this.onTouchMove = this.onTouchMove.bind(this);
         this.onTouchEnd = this.onTouchEnd.bind(this);
         this.doAnimation = this.doAnimation.bind(this);
     }
 
+    setActiveNode(e) {
+        this.$activeNode = findMatchingTarget(e.target, this.childNodes);
+    }
+
+    onScrollHandler(e) {
+        let top = e.target.scrollTop;
+        let left = e.target.scrollLeft;
+
+        // ignore while the other way of scrolling is in control
+        if ( this.isTouching || this.isAnimating ) {
+            e.preventDefault();
+            return;
+        }
+
+        this.childNodes.forEach(node => {
+            if ( node.id !== this.$activeNode ) {
+                node.children[0].scrollTop = top;
+                node.children[0].scrollLeft = left;
+            }
+        })
+
+        this.currentXPos = left;
+        this.currentYPos = top;
+    }
+
     onTouchStart(e) {
+        this.$activeNode = findMatchingTarget(e.target, this.childNodes);
+
         this.isTouching = true;
         this.didSwipe = false;
         this.startTime = Date.parse(new Date());
@@ -193,11 +224,6 @@ class SynchronousScroll extends Component {
                     this.isAnimating = false;
                 }
             } else {
-                nodes.forEach(node => {
-                    node.children[0][scrollKey] = 0;
-                });
-                this[key] = 0;
-
                 this.isAnimating = false;
             }
         }
@@ -207,10 +233,20 @@ class SynchronousScroll extends Component {
 
     componentDidMount() {
         this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );
+
+        if ( ! this.hasTouch ) {
+            this.$listener.addEventListener( 'mouseover', this.setActiveNode, true );
+        }
+        this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
     }
 
     componentWillUnmount() {
         this.$listener.removeEventListener( this.START_EVT, this.onTouchStart );
+
+        if ( ! this.hasTouch ) {
+            this.$listener.removeEventListener( 'mouseover', this.setActiveNode );
+        }
+        this.$listener.removeEventListener( 'scroll', this.onScrollHandler );
     }
 
     render() {
@@ -238,4 +274,4 @@ class SynchronousScroll extends Component {
     }
 }
 
-export default SynchronousScroll;
+export default SynchronousScrollSwipe;
