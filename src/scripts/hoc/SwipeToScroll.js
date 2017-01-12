@@ -6,6 +6,7 @@ import {
     computeKinetics,
     easeOutQuint,
     LEFT,
+    RIGHT,
     UP
 } from '../utils.js'
 
@@ -89,20 +90,18 @@ class SynchronousScroll extends Component {
             }
         }
 
-        /**/
-
-        // if animating due to momentum from previous swiping
-        if ( this.isAnimating ) {
-            window.cancelAnimationFrame(this.loop);
-            this.loop = null;
-        }
-
         if ( ! this.isTouching ) {
             return;
         }
 
         this.didSwipe = true;
         e.preventDefault();
+
+        if ( this.isAnimating ) {
+            window.cancelAnimationFrame(this.loop);
+            this.loop = null;
+            this.isAnimating = false;
+        }
 
         point = getPoint(e, this.hasTouch);
         deltaY = point.y - this.lastY;
@@ -131,11 +130,11 @@ class SynchronousScroll extends Component {
         });
 
         let diff, from;
-        if ( swipe.direction === LEFT || swipe.direction === UP ) {
-            diff = swipe.diffX;
+        if ( swipe.direction === LEFT || swipe.direction === RIGHT ) {
+            diff = Math.abs(point.x - this.startX);
             from = this.currentXPos;
         } else {
-            diff = swipe.diffY;
+            diff = Math.abs(point.y - this.startY);
             from = this.currentYPos;
         }
 
@@ -165,10 +164,20 @@ class SynchronousScroll extends Component {
 
     doAnimation(direction, from, to, duration) {
         let diff = to - from;
-        let scrollKey;
-
         let start, progress, delta;
-        const animate = (timestamp) => {
+
+        var nodes = this.childNodes;
+        var scrollKey, key;
+
+        if ( direction === LEFT || direction === RIGHT ) {
+            scrollKey = 'scrollLeft';
+            key = 'currentXPos'
+        } else {
+            scrollKey = 'scrollTop';
+            key = 'currentYPos'
+        }
+
+        var step = (timestamp) => {
             if ( ! start ) {
                 start = timestamp;
             }
@@ -176,30 +185,24 @@ class SynchronousScroll extends Component {
             progress = timestamp - start;
             delta = easeOutQuint(progress, from, diff, duration);
 
-            if ( direction === LEFT || direction === UP ) {
-                scrollKey = 'scrollLeft';
-                this.currentXPos = delta;
-            } else {
-                scrollKey = 'scrollTop';
-                this.currentYPos = delta;
-            }
-            this.childNodes.forEach(node => {
-                node.children[0][scrollKey] = delta;
-            });
+            if ( delta > 0 ) {
+                nodes.forEach(node => {
+                    node.children[0][scrollKey] = delta;
+                });
+                this[key] = delta;
 
-            if ( duration > progress ) {
-                if ( this.loop === null ) {
-                    this.loop = window.requestAnimationFrame(animate);
+                if ( duration > progress ) {
+                    this.loop = window.requestAnimationFrame(step);
+                    this.isAnimating = true;
                 } else {
-                    window.requestAnimationFrame(animate);
+                    this.isAnimating = false;
                 }
-                this.isAnimating = true;
             } else {
                 this.isAnimating = false;
             }
         }
 
-        window.requestAnimationFrame(animate);
+        window.requestAnimationFrame(step);
     }
 
     componentDidMount() {
