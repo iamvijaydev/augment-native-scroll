@@ -1,4 +1,4 @@
-import React, { Component, Children } from 'react';
+import React, { Component, Children, PropTypes } from 'react';
 import { findMatchingTarget } from '../utils.js'
 
 class SynchronousScroll extends Component {
@@ -34,7 +34,7 @@ class SynchronousScroll extends Component {
 
     componentDidMount() {
         this.$listener.addEventListener( this.detectEvt, this.setActiveNode, true );
-        this.$listener.addEventListener( 'scroll', this.onScrollHandler, true);
+        this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
     }
 
     componentWillUnmount() {
@@ -65,6 +65,10 @@ class SynchronousScroll extends Component {
             </span>
         )
     }
+}
+
+SynchronousScroll.propTypes = {
+    children: PropTypes.element.isRequired
 }
 
 export default SynchronousScroll;

@@ -16,19 +16,23 @@ class App extends Component {
                 </div>
 
                 <div className="jumbotron">
-                    <p className="lead">The aim of this project is to experiment with custom wrappers over native scroll to achive higher functionality.</p>
-                    <p className="lead">The prime feature is about synchronous scroll, where multiple scrollable areas, scroll as one when anyone of them is scrolled.</p>
-                    <p className="lead">The demos are step to test them on UIWebView (iOS) and determine the best way we can achive the desired result.</p>
+                    <p className="lead">Primary objective is to have multiple (related) scrollable areas, scroll as one, when anyone of them is scrolled.</p>
+                    <p className="lead">The demos are step up to test them on UIWebView (iOS) and determine the best way we can achieve the desired results.</p>
+                    <p className="lead">There are three different implemented flavors of native scrolls listed below.</p>
                 </div>
 
                 <div className="row marketing">
-                    <h4>Synchronous Scroll</h4>
-                    <p>Related scrollable areas scroll as one when anyone of them is scrolled via mouse or keyboard. This is primarily focused for non-touch devices</p>
+                    <h4>Synchronous Scroll <span className="mute">(Augmenting default scroll)</span></h4>
+                    <p>This flavor wraps the native scroll to have multiple scrollable areas scroll as one. Works on both touch and non-touch devices.</p>
                     <p><Link to='/synchronous-scroll' activeClassName='active'>Demo</Link></p>
 
-                    <h4>Swipe to Scroll</h4>
-                    <p>Related scrollable areas can be scrolled via swipe or on non-touch devices mimicing the same via mouse. This is primarily focused for bring touch like features to non-touch devices</p>
+                    <h4>Swipe to Scroll <span className="mute">(Mimic tap-swipe on non-touch devices)</span></h4>
+                    <p>This flavor wraps the native scroll and disables default scroll behavior to provide tap and swipe like feature for non-touch devices. Only works on non-touch devices.</p>
                     <p><Link to='/swipe-to-scroll' activeClassName='active'>Demo</Link></p>
+
+                    <h4>Synchronous Scroll Swipe <span className="mute">(Both flavors working together)</span></h4>
+                    <p>This flavor detects touch support and provides synchronous scroll on both touch and no-touch devices. Additionally on non-touch devices it also provided swipe to scroll.</p>
+                    <p><Link to='/synchronous-scroll-swipe' activeClassName='active'>Demo</Link></p>
                 </div>
 
                 <footer className="footer">

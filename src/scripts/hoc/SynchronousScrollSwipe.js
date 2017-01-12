@@ -1,24 +1,27 @@
 import React, { Component, Children, PropTypes } from 'react';
 import {
+    findMatchingTarget,
     getPoint,
     computeSwipe,
     computeKinetics,
     easeOutQuint,
     LEFT,
-    RIGHT
+    RIGHT,
 } from '../utils.js'
 
-class SwipeToScroll extends Component {
+class SynchronousScrollSwipe extends Component {
     constructor(props) {
         super(props);
 
         this.hasTouch = 'ontouchstart' in window;
+        this.DETECT_EVT = this.hasTouch ? 'touchstart' : 'mouseover';
         this.START_EVT = this.hasTouch ? 'touchstart' : 'mousedown';
         this.MOVE_EVT  = this.hasTouch ? 'touchmove' : 'mousemove';
         this.END_EVT   = this.hasTouch ? 'touchend' : 'mouseup';
 
         this.$listener = undefined;
         this.childNodes = [];
+        this.$activeNode = undefined;
 
         this.currentXPos = 0;
         this.currentYPos = 0;
@@ -35,6 +38,7 @@ class SwipeToScroll extends Component {
         this.lastX = 0;
         this.lastY = 0;
 
+        this.setActiveNode = this.setActiveNode.bind(this);
         this.onScrollHandler = this.onScrollHandler.bind(this);
         this.onTouchStart = this.onTouchStart.bind(this);
         this.onTouchMove = this.onTouchMove.bind(this);
@@ -42,20 +46,34 @@ class SwipeToScroll extends Component {
         this.doAnimation = this.doAnimation.bind(this);
     }
 
-    // prevent other scroll methods
+    setActiveNode(e) {
+        this.$activeNode = findMatchingTarget(e.target, this.childNodes);
+    }
+
     onScrollHandler(e) {
+        let top = e.target.scrollTop;
+        let left = e.target.scrollLeft;
+
+        // ignore while the other way of scrolling is in control
         if ( this.isTouching || this.isAnimating ) {
             e.preventDefault();
             return;
         }
 
         this.childNodes.forEach(node => {
-            node.children[0].scrollTop = this.currentYPos;
-            node.children[0].scrollLeft = this.currentXPos;
-        });
+            if ( node.id !== this.$activeNode ) {
+                node.children[0].scrollTop = top;
+                node.children[0].scrollLeft = left;
+            }
+        })
+
+        this.currentXPos = left;
+        this.currentYPos = top;
     }
 
     onTouchStart(e) {
+        this.$activeNode = findMatchingTarget(e.target, this.childNodes);
+
         this.isTouching = true;
         this.didSwipe = false;
         this.startTime = Date.parse(new Date());
@@ -205,11 +223,6 @@ class SwipeToScroll extends Component {
                     this.isAnimating = false;
                 }
             } else {
-                nodes.forEach(node => {
-                    node.children[0][scrollKey] = 0;
-                });
-                this[key] = 0;
-
                 this.isAnimating = false;
             }
         }
@@ -218,13 +231,21 @@ class SwipeToScroll extends Component {
     }
 
     componentDidMount() {
-        this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );
+        this.$listener.addEventListener( this.DETECT_EVT, this.setActiveNode, true );
         this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
+
+        if ( ! this.hasTouch ) {
+            this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );
+        }
     }
 
     componentWillUnmount() {
-        this.$listener.removeEventListener( this.START_EVT, this.onTouchStart );
+        this.$listener.removeEventListener( this.DETECT_EVT, this.setActiveNode );
         this.$listener.removeEventListener( 'scroll', this.onScrollHandler );
+
+        if ( ! this.hasTouch ) {
+            this.$listener.removeEventListener( this.START_EVT, this.onTouchStart );
+        }
     }
 
     render() {
@@ -252,8 +273,8 @@ class SwipeToScroll extends Component {
     }
 }
 
-SwipeToScroll.propTypes = {
+SynchronousScrollSwipe.propTypes = {
     children: PropTypes.element.isRequired
 }
 
-export default SwipeToScroll;
+export default SynchronousScrollSwipe;

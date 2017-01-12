@@ -67,19 +67,19 @@ export function computeSwipe(options) {
     }
 }
 
-export function computeKinetics (from, direction, swipeLength, swipeDuration) {
-    var deceleration = 0.0006;
+export function computeKinetics (from, direction, distance, time) {
+    var deceleration = 0.0009;
 
-    var swipeDuration = Math.max(swipeDuration, 200);
-    var speed = swipeLength / swipeDuration;
+    var correctedTime = Math.max(time, 200);
+    var speed = distance / correctedTime;
 
     var resultingDisplacement = (speed * speed) / (2 * deceleration);
-    var duration = speed / deceleration;
+    var duration = Math.abs(speed / deceleration);
 
     var to = 0;
 
     // direction is left or up
-    if(direction === LEFT || direction === UP) {
+    if(direction === LEFT || direction === UP ) {
         to = from + resultingDisplacement;
     // direction is right or down
     } else {
