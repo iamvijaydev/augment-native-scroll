@@ -34,7 +34,7 @@ class SynchronousScroll extends Component {
 
     componentDidMount() {
         this.$listener.addEventListener( this.detectEvt, this.setActiveNode, true );
-        this.$listener.addEventListener( 'scroll', this.onScrollHandler, true);
+        this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
     }
 
     componentWillUnmount() {
