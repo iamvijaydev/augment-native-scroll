@@ -134,6 +134,12 @@ class SynchronousScrollSwipe extends Component {
     onTouchStart(e) {
         this.activeId = findMatchingTarget(e.target, this.childNodes);
 
+        if ( this.isAnimating ) {
+            this.isAnimating = false;
+            window.cancelAnimationFrame(this.loop);
+            this.loop = null;
+        }
+
         this.isTouching = true;
         this.didSwipe = false;
         this.startTime = getTime();
@@ -161,8 +167,8 @@ class SynchronousScrollSwipe extends Component {
         let deltaX = point.x - this.lastX;
         let deltaY = point.y - this.lastY;
 
-        deltaX = this.scrollLeft === 0 ? deltaX : this.scrollLeft + deltaX;
-        deltaY = this.scrollTop === 0 ? deltaY : this.scrollTop + deltaY;
+        deltaX = this.scrollLeft === 0 ? deltaX : this.scrollLeft - deltaX;
+        deltaY = this.scrollTop === 0 ? deltaY : this.scrollTop - deltaY;
         this.scrollTo(deltaX, deltaY);
 
         this.lastY = point.y;
@@ -178,7 +184,7 @@ class SynchronousScrollSwipe extends Component {
 
         let point = getPoint(e, this.hasTouch);
         let duration = getTime() - this.startTime;
-        let time, momentumX, momentumY;
+        let momentumX, momentumY;
 
         if ( duration < 300 ) {
             momentumX = momentum(
@@ -196,10 +202,13 @@ class SynchronousScrollSwipe extends Component {
                 this.clientHeight
             );
 
-            time = Math.max(momentumX.duration, momentumY.duration);
+            let time = Math.max(momentumX.duration, momentumY.duration);
+            let destX = this.scrollLeft + momentumX.destination;
+            let destY = this.scrollTop + momentumY.destination;
 
-            if ( momentumX.destination !== this.scrollLeft || momentumY.destination !== this.scrollTop ) {
-                this.animate(this.startX, this.startY, momentumX.destination, momentumY.destination, time);
+            if ( destX !== this.scrollLeft || destY !== this.scrollTop ) {
+                console.log(this.scrollLeft, this.scrollTop, destX, destY, time);
+                this.animate(this.scrollLeft, this.scrollTop, destX, destY, time);
             }
         }
 
@@ -215,6 +224,7 @@ class SynchronousScrollSwipe extends Component {
     }
 
     animate (startX, startY, destX, destY, duration) {
+        console.log(startX, startY, destX, destY, duration);
         let startTime = getTime(),
             destTime = startTime + duration;
 
@@ -237,7 +247,7 @@ class SynchronousScrollSwipe extends Component {
             this.scrollTo(newX, newY);
 
             if ( this.isAnimating ) {
-                window.requestAnimationFrame(step);
+                this.loop = window.requestAnimationFrame(step);
             }
         }
 
