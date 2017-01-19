@@ -52,7 +52,11 @@ class SynchronousScrollSwipe extends Component {
         delta = this.scrollLeft - this.lastScrollLeft;
         this.lastScrollLeft = this.scrollLeft;
 
-        this.velocityLeft = 0.01 * (1000 * delta / (1 + elapsed)) + 0.2 * this.velocityLeft;
+        if ( delta > 5 || delta < -5 ) {
+            this.velocityLeft = 0.05 * (1000 * delta / (1 + elapsed)) + 0.2 * this.velocityLeft;
+        } else {
+            this.velocityLeft = 0;
+        }
     }
 
     topTracker() {
@@ -64,7 +68,7 @@ class SynchronousScrollSwipe extends Component {
         delta = this.scrollTop - this.lastScrollTop;
         this.lastScrollTop = this.scrollTop;
 
-        this.velocityTop = 0.2 * (1000 * delta / (1 + elapsed)) + 0.2 * this.velocityTop;
+        this.velocityTop = 0.1 * (1000 * delta / (1 + elapsed)) + 0.2 * this.velocityTop;
     }
 
     autoScroll() {
@@ -224,14 +228,20 @@ class SynchronousScrollSwipe extends Component {
         this.pressed = false;
 
         this.timestamp = getTime();
+        this.topTracker();
+        this.leftTracker();
 
         if (this.velocityTop > 10 || this.velocityTop < -10) {
             this.amplitudeTop = 0.8 * this.velocityTop;
             this.targetTop = Math.round(this.scrollTop + this.amplitudeTop);
+        } else {
+            this.targetTop = this.scrollTop;
         }
         if (this.velocityLeft > 10 || this.velocityLeft < -10) {
             this.amplitudeLeft = 0.8 * this.velocityLeft;
             this.targetLeft = Math.round(this.scrollLeft + this.amplitudeLeft);
+        } else {
+            this.targetLeft = this.scrollLeft;
         }
 
         this.isAutoScrolling = true;
