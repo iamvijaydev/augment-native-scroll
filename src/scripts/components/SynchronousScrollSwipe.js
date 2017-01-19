@@ -37,10 +37,10 @@ class SynchronousScrollSwipe extends Component {
         this.setActiveNode = this.setActiveNode.bind(this);
         this.onScrollHandler = this.onScrollHandler.bind(this);
         this.autoScroll = this.autoScroll.bind(this);
-        
+
         this.tap = this.tap.bind(this);
-        this.drag = this.drag.bind(this);
-        this.release = this.release.bind(this);
+        this.swipe = this.swipe.bind(this);
+        this.end = this.end.bind(this);
     }
 
     leftTracker() {
@@ -180,15 +180,15 @@ class SynchronousScrollSwipe extends Component {
             this.autoScrollTracker = null;
         }
 
-        this.$listener.addEventListener( 'mousemove', this.drag, true );
-        this.$listener.addEventListener( 'mouseup', this.release, true );
+        this.$listener.addEventListener( 'mousemove', this.swipe, true );
+        this.$listener.addEventListener( 'mouseup', this.end, true );
 
         e.preventDefault();
         e.stopPropagation();
         return false;
     }
 
-    drag(e) {
+    swipe(e) {
         var x, y, deltaX, deltaY;
 
         if (this.pressed) {
@@ -220,7 +220,7 @@ class SynchronousScrollSwipe extends Component {
         return false;
     }
 
-    release(e) {
+    end(e) {
         this.pressed = false;
 
         this.timestamp = getTime();
@@ -237,8 +237,8 @@ class SynchronousScrollSwipe extends Component {
         this.isAutoScrolling = true;
         this.autoScrollTracker = requestAnimationFrame(this.autoScroll);
 
-        this.$listener.removeEventListener( 'mousemove', this.drag );
-        this.$listener.removeEventListener( 'mouseup', this.release );
+        this.$listener.removeEventListener( 'mousemove', this.swipe );
+        this.$listener.removeEventListener( 'mouseup', this.end );
 
         e.preventDefault();
         e.stopPropagation();

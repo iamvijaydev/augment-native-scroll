@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SynchronousScrollSwipe from '../hoc/SynchronousScrollSwipe';
+import SynchronousScrollSwipe from './SynchronousScrollSwipe';
 import List from './List';
 import Table from './Table';
 import { generateData } from '../utils';
