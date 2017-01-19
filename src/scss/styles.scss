@@ -43,10 +43,11 @@ body {
     top: 0;
     bottom: 0;
     width: 150px;
-    overflow-x: hidden;
-    overflow-y: auto;
     box-shadow: 2px -5px 5px rgba(0,0,0,.15);
     @include scrollbars(.5em, slategray);
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
 
     li {
         font-size: 14px;
@@ -84,8 +85,9 @@ body {
     right: 0;
     top: 0;
     bottom: 0;
-    overflow: auto;
     @include scrollbars(.5em, slategray);
+    overflow: scroll;
+    -webkit-overflow-scrolling: touch;
 
     table {
         border-collapse: collapse;
