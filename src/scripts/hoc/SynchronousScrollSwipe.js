@@ -1,15 +1,5 @@
 import React, { Component, Children, PropTypes } from 'react';
-import {
-    findMatchingTarget,
-    getPoint,
-    momentum
-} from '../utils.js'
-
-const ease = (k) => {
-    return k * ( 2 - k );
-}
-
-const getTime = Date.now || function getTime () { return new Date().getTime(); };
+import { findMatchingTarget, getPoint, getTime } from '../utils.js'
 
 class SynchronousScrollSwipe extends Component {
     constructor(props) {
@@ -17,9 +7,6 @@ class SynchronousScrollSwipe extends Component {
 
         this.hasTouch = 'ontouchstart' in window;
         this.DETECT_EVT = this.hasTouch ? 'touchstart' : 'mouseover';
-        this.START_EVT = this.hasTouch ? 'touchstart' : 'mousedown';
-        this.MOVE_EVT  = this.hasTouch ? 'touchmove' : 'mousemove';
-        this.END_EVT   = this.hasTouch ? 'touchend' : 'mouseup';
 
         this.$listener = undefined;
         this.childNodes = [];
@@ -27,81 +14,113 @@ class SynchronousScrollSwipe extends Component {
 
         this.scrollLeft = 0;
         this.scrollTop = 0;
-        this.scrollHeight = 0;
-        this.scrollWidth = 0;
-        this.clientHeight = 0;
-        this.clientWidth = 0;
-        this.maxScrollX = 0;
-        this.maxScrollY = 0;
+        this.lastScrollLeft = 0;
+        this.lastScrollTop = 0;
+        this.targetTop = 0;
+        this.targetLeft = 0;
 
-        this.isTouching = false;
-        this.didSwipe = false;
+        this.velocityTop = 0;
+        this.velocityLeft = 0;
+        this.amplitudeTop = 0;
+        this.amplitudeLeft =0;
 
-        this.isAnimating = false;
-        this.loop = null;
+        this.topTimer = null;
+        this.leftTimer = null;
+        this.topTracker = this.topTracker.bind(this);
+        this.leftTracker = this.leftTracker.bind(this);
 
-        this.startTime = 0;
-        this.startX = 0;
-        this.startY = 0;
-        this.lastX = 0;
-        this.lastY = 0;
+        this.pressed = false;
+        this.autoScrollTracker = null;
+        this.isAutoScrolling = false;
 
         this.scrollTo = this.scrollTo.bind(this);
         this.setActiveNode = this.setActiveNode.bind(this);
-        this.setScrollHeightWidth = this.setScrollHeightWidth.bind(this);
-
         this.onScrollHandler = this.onScrollHandler.bind(this);
-        this.onTouchStart = this.onTouchStart.bind(this);
-        this.onTouchMove = this.onTouchMove.bind(this);
-        this.onTouchEnd = this.onTouchEnd.bind(this);
-        this.animate = this.animate.bind(this);
+        this.autoScroll = this.autoScroll.bind(this);
+        
+        this.tap = this.tap.bind(this);
+        this.drag = this.drag.bind(this);
+        this.release = this.release.bind(this);
     }
 
-    scrollTo(valX, valY, forScroll) {
-        let scrollX = valX || this.scrollLeft
-        let scrollY = valY || this.scrollTop;
+    leftTracker() {
+        var now, elapsed, delta;
 
-        this.childNodes.forEach(node => {
-            if ( forScroll && node.id === this.activeId ) {
-                // do nothing
-            } else {
-                node.children[0].scrollLeft = scrollX;
-                node.children[0].scrollTop = scrollY;
-            }
-        });
+        now = getTime();
+        elapsed = now - this.timeStamp;
+        this.timeStamp = now;
+        delta = this.scrollLeft - this.lastScrollLeft;
+        this.lastScrollLeft = this.scrollLeft;
 
-        this.scrollLeft = scrollX;
-        this.scrollTop = scrollY;
+        this.velocityLeft = 0.01 * (1000 * delta / (1 + elapsed)) + 0.2 * this.velocityLeft;
     }
 
-    setScrollHeightWidth() {
-        let scrollHeight = 0;
-        let scrollWidth = 0;
-        let clientHeight = 0;
-        let clientWidth = 0;
+    topTracker() {
+        var now, elapsed, delta;
+
+        now = getTime();
+        elapsed = now - this.timeStamp;
+        this.timeStamp = now;
+        delta = this.scrollTop - this.lastScrollTop;
+        this.lastScrollTop = this.scrollTop;
+
+        this.velocityTop = 0.2 * (1000 * delta / (1 + elapsed)) + 0.2 * this.velocityTop;
+    }
+
+    autoScroll() {
+        var elapsed;
+        var deltaY = 0, deltaX = 0, scrollX = 0, scrollY = 0;
+        var timeConstant = 325;
+
+        elapsed = getTime() - this.timestamp;
+
+        if ( this.amplitudeTop ) {
+            deltaY = -this.amplitudeTop * Math.exp(-elapsed / timeConstant);
+        }
+        if ( this.amplitudeLeft ) {
+            deltaX = -this.amplitudeLeft * Math.exp(-elapsed / timeConstant);
+        }
+
+        if ( deltaX > 0.5 || deltaX < -0.5 ) {
+            scrollX = deltaX;
+        } else {
+            scrollX = 0;
+        }
+
+        if ( deltaY > 0.5 || deltaY < -0.5 ) {
+            scrollY = deltaY;
+        } else {
+            scrollY = 0;
+        }
+
+        this.scrollTo(this.targetLeft + scrollX, this.targetTop + scrollY);
+
+        if ( (deltaX > 0.5 || deltaX < -0.5) || (deltaY > 0.5 || deltaY < -0.5) ) {
+            this.autoScrollTracker = requestAnimationFrame(this.autoScroll);
+        } else {
+            this.isAutoScrolling = false;
+            this.autoScrollTracker = null;
+        }
+    }
+
+    scrollTo(left, top) {
+        let correctedLeft = Math.round(left);
+        let correctedTop = Math.round(top);
 
         this.childNodes.forEach(node => {
-            if ( node.children[0].scrollHeight > scrollHeight  ) {
-                scrollHeight = node.children[0].scrollHeight;
-            }
-            if ( node.children[0].scrollWidth > scrollWidth  ) {
-                scrollWidth = node.children[0].scrollWidth;
-            }
-            if ( node.children[0].clientHeight > clientHeight  ) {
-                clientHeight = node.children[0].clientHeight;
-            }
-            if ( node.children[0].clientWidth > clientWidth  ) {
-                clientWidth = node.children[0].clientWidth;
-            }
-        });
+            const $el = node.children[0];
+            let maxScrollX = $el.scrollWidth - $el.clientWidth;
+            let maxScrollY = $el.scrollHeight - $el.clientHeight;
 
-        this.scrollHeight = scrollHeight;
-        this.scrollWidth = scrollWidth;
-        this.clientHeight = clientHeight;
-        this.clientWidth = clientWidth;
-
-        this.maxScrollY = this.scrollHeight - this.clientHeight;
-        this.maxScrollX = this.scrollWidth - this.clientWidth;
+            if ( maxScrollX > 0 && correctedLeft >= 0 && correctedLeft <= maxScrollX ) {
+                $el.scrollLeft = correctedLeft;
+                this.scrollLeft = correctedLeft;
+            }
+            if ( maxScrollY > 0 && correctedTop > 0 && correctedTop <= maxScrollY ) {
+                $el.scrollTop = correctedTop;
+                this.scrollTop = correctedTop;
+            }
+        })
     }
 
     setActiveNode(e) {
@@ -109,150 +128,121 @@ class SynchronousScrollSwipe extends Component {
     }
 
     onScrollHandler(e) {
-        if ( this.isTouching || this.isAnimating ) {
+        if ( this.pressed || this.isAutoScrolling ) {
             e.preventDefault();
             e.stopPropagation();
             return;
         }
 
-        // the target may not have a particular scroll value or may be 0
-        // and that will get applied to the other scroll area..
         let target = e.target;
         let valX = undefined;
         let valY = undefined;
 
         if ( target.clientWidth !== target.scrollWidth ) {
             valX = target.scrollLeft;
+            this.lastScrollLeft = this.scrollLeft;
+            this.scrollLeft = valX;
+        } else {
+            valX = this.scrollLeft;
         }
         if ( target.clientHeight !== target.scrollHeight ) {
             valY = target.scrollTop;
+            this.lastScrollTop = this.scrollTop;
+            this.scrollTop = valY;
+        } else {
+            valY = this.scrollTop;
         }
 
-        this.scrollTo(valX, valY, true);
+        this.childNodes.forEach(node => {
+            if ( node.id !== this.activeId ) {
+                node.children[0].scrollLeft = valX;
+                node.children[0].scrollTop = valY;
+            }
+        });
     }
 
-    onTouchStart(e) {
-        this.activeId = findMatchingTarget(e.target, this.childNodes);
+    tap(e) {
+        this.pressed = true;
+        this.referenceX = getPoint(e, this.hasTouch).x;
+        this.referenceY = getPoint(e, this.hasTouch).y;
 
-        if ( this.isAnimating ) {
-            this.isAnimating = false;
-            window.cancelAnimationFrame(this.loop);
-            this.loop = null;
+        this.velocityTop = this.amplitudeTop = 0;
+        this.velocityLeft = this.amplitudeLeft = 0;
+
+        this.lastScrollTop = this.scrollTop;
+        this.lastScrollLeft = this.scrollLeft;
+
+        this.timeStamp = getTime();
+
+        if ( this.isAutoScrolling ) {
+            cancelAnimationFrame(this.autoScrollTracker);
+            this.isAutoScrolling = false;
+            this.autoScrollTracker = null;
         }
 
-        this.isTouching = true;
-        this.didSwipe = false;
-        this.startTime = getTime();
-
-        let point = getPoint(e, this.hasTouch);
-        this.startX = this.lastX = point.x;
-        this.startY = this.lastY = point.y;
-
-        this.$listener.removeEventListener( this.MOVE_EVT, this.onTouchMove );
-        this.$listener.addEventListener( this.MOVE_EVT, this.onTouchMove, true );
-
-        this.$listener.removeEventListener( this.END_EVT, this.onTouchEnd );
-        this.$listener.addEventListener( this.END_EVT, this.onTouchEnd, true );
-    }
-
-    onTouchMove(e) {
-        if ( ! this.isTouching ) {
-            return;
-        }
-
-        this.didSwipe = true;
-        e.preventDefault();
-
-        let point = getPoint(e, this.hasTouch);
-        let deltaX = point.x - this.lastX;
-        let deltaY = point.y - this.lastY;
-
-        deltaX = this.scrollLeft === 0 ? deltaX : this.scrollLeft - deltaX;
-        deltaY = this.scrollTop === 0 ? deltaY : this.scrollTop - deltaY;
-        this.scrollTo(deltaX, deltaY);
-
-        this.lastY = point.y;
-        this.lastX = point.x;
-    }
-
-    onTouchEnd(e) {
-        if ( ! this.didSwipe ) {
-            return;
-        }
+        this.$listener.addEventListener( 'mousemove', this.drag, true );
+        this.$listener.addEventListener( 'mouseup', this.release, true );
 
         e.preventDefault();
-
-        let point = getPoint(e, this.hasTouch);
-        let duration = getTime() - this.startTime;
-        let momentumX, momentumY;
-
-        if ( duration < 300 ) {
-            momentumX = momentum(
-                point.x,
-                this.startX,
-                duration,
-                this.maxScrollX,
-                this.clientWidth
-            );
-            momentumY = momentum(
-                point.y,
-                this.startY,
-                duration,
-                this.maxScrollY,
-                this.clientHeight
-            );
-
-            let time = Math.max(momentumX.duration, momentumY.duration);
-            let destX = this.scrollLeft + momentumX.destination;
-            let destY = this.scrollTop + momentumY.destination;
-
-            if ( destX !== this.scrollLeft || destY !== this.scrollTop ) {
-                console.log(this.scrollLeft, this.scrollTop, destX, destY, time);
-                this.animate(this.scrollLeft, this.scrollTop, destX, destY, time);
-            }
-        }
-
-        /* clean up */
-        this.isTouching = false;
-        this.didSwipe = false;
-        this.startX = 0;
-        this.startY = 0;
-        this.lastX = 0;
-        this.lastY = 0;
-        this.$listener.removeEventListener( this.MOVE_EVT, this.onTouchMove );
-        this.$listener.removeEventListener( this.END_EVT, this.onTouchEnd );
+        e.stopPropagation();
+        return false;
     }
 
-    animate (startX, startY, destX, destY, duration) {
-        console.log(startX, startY, destX, destY, duration);
-        let startTime = getTime(),
-            destTime = startTime + duration;
+    drag(e) {
+        var x, y, deltaX, deltaY;
 
-        const step = () => {
-            let now = getTime(),
-                newX,
-                newY,
-                easing;
+        if (this.pressed) {
+            x = getPoint(e, this.hasTouch).x;
+            y = getPoint(e, this.hasTouch).y;
 
-            if ( now >= destTime ) {
-                this.isAnimating = false;
-                this.scrollTo(destX, destY);
-                return;
+            deltaX = this.referenceX - x;
+            deltaY = this.referenceY - y;
+
+            if (deltaX > 2 || deltaX < -2) {
+                this.referenceX = x;
+            } else {
+                deltaX = 0;
+            }
+            if (deltaY > 2 || deltaY < -2) {
+                this.referenceY = y;
+            } else {
+                deltaY = 0;
             }
 
-            now = ( now - startTime ) / duration;
-            easing = ease(now);
-            newX = ( destX - startX ) * easing + startX;
-            newY = ( destY - startY ) * easing + startY;
-            this.scrollTo(newX, newY);
+            this.topTracker();
+            this.leftTracker();
 
-            if ( this.isAnimating ) {
-                this.loop = window.requestAnimationFrame(step);
-            }
+            this.scrollTo( this.scrollLeft + deltaX, this.scrollTop + deltaY );
         }
 
-        this.isAnimating = true;
-        step();
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+    }
+
+    release(e) {
+        this.pressed = false;
+
+        this.timestamp = getTime();
+
+        if (this.velocityTop > 10 || this.velocityTop < -10) {
+            this.amplitudeTop = 0.8 * this.velocityTop;
+            this.targetTop = Math.round(this.scrollTop + this.amplitudeTop);
+        }
+        if (this.velocityLeft > 10 || this.velocityLeft < -10) {
+            this.amplitudeLeft = 0.8 * this.velocityLeft;
+            this.targetLeft = Math.round(this.scrollLeft + this.amplitudeLeft);
+        }
+
+        this.isAutoScrolling = true;
+        this.autoScrollTracker = requestAnimationFrame(this.autoScroll);
+
+        this.$listener.removeEventListener( 'mousemove', this.drag );
+        this.$listener.removeEventListener( 'mouseup', this.release );
+
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
     }
 
     componentDidMount() {
@@ -260,8 +250,7 @@ class SynchronousScrollSwipe extends Component {
         this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
 
         if ( ! this.hasTouch ) {
-            this.$listener.addEventListener( this.START_EVT, this.onTouchStart, true );
-            this.setScrollHeightWidth();
+            this.$listener.addEventListener( 'mousedown', this.tap, true );
         }
     }
 
@@ -270,7 +259,7 @@ class SynchronousScrollSwipe extends Component {
         this.$listener.removeEventListener( 'scroll', this.onScrollHandler );
 
         if ( ! this.hasTouch ) {
-            this.$listener.removeEventListener( this.START_EVT, this.onTouchStart );
+            this.$listener.removeEventListener( 'mousedown', this.tap );
         }
     }
 
@@ -299,8 +288,11 @@ class SynchronousScrollSwipe extends Component {
     }
 }
 
-// SynchronousScrollSwipe.propTypes = {
-//     children: PropTypes.element.isRequired
-// }
+SynchronousScrollSwipe.propTypes = {
+    children: PropTypes.oneOfType([
+        PropTypes.arrayOf(PropTypes.node),
+        PropTypes.node
+    ])
+}
 
 export default SynchronousScrollSwipe;
