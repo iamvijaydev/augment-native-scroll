@@ -12,7 +12,7 @@ class App extends Component {
 
     render() {
         return (
-            <SynchronousScrollSwipe>
+            <SynchronousScrollSwipe options={{enableKinetic: this.state.enableKinetic}}>
                 <List data={this.state.list} />
                 <Table data={this.state.table} />
             </SynchronousScrollSwipe>

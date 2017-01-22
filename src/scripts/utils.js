@@ -39,7 +39,7 @@ export function generateData () {
     let table = [];
     let row;
 
-    for( let i = 0; i < 70; i++ ) {
+    for( let i = 0; i < 100; i++ ) {
         list.push( Math.random().toString(36).substring(7) );
 
         row = [];
@@ -52,6 +52,7 @@ export function generateData () {
 
     return {
         list,
-        table
+        table,
+        enableKinetic: true
     }
 }

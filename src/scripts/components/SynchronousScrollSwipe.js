@@ -5,6 +5,8 @@ class SynchronousScrollSwipe extends Component {
     constructor(props) {
         super(props);
 
+        this.state = this.generateState(props.options);
+
         this.hasTouch = 'ontouchstart' in window;
         this.DETECT_EVT = this.hasTouch ? 'touchstart' : 'mouseover';
 
@@ -22,10 +24,10 @@ class SynchronousScrollSwipe extends Component {
         this.velocityTop = 0;
         this.velocityLeft = 0;
         this.amplitudeTop = 0;
-        this.amplitudeLeft =0;
+        this.amplitudeLeft = 0;
 
-        this.topTimer = null;
-        this.leftTimer = null;
+        this.generateState = this.generateState.bind(this);
+
         this.topTracker = this.topTracker.bind(this);
         this.leftTracker = this.leftTracker.bind(this);
 
@@ -41,6 +43,20 @@ class SynchronousScrollSwipe extends Component {
         this.tap = this.tap.bind(this);
         this.swipe = this.swipe.bind(this);
         this.end = this.end.bind(this);
+
+        this.scrollToLeftStart = this.scrollToLeftStart.bind(this);
+        this.scrollToTopStart = this.scrollToTopStart.bind(this);
+    }
+
+    generateState(options = {}) {
+        let defaults = {
+            enableKinetic: false
+        }
+
+        return Object.assign(
+            defaults,
+            options
+        )
     }
 
     leftTracker() {
@@ -107,7 +123,7 @@ class SynchronousScrollSwipe extends Component {
         }
     }
 
-    scrollTo(left, top) {
+    scrollTo(left = this.scrollLeft, top = this.scrollTop) {
         let correctedLeft = Math.round(left);
         let correctedTop = Math.round(top);
 
@@ -125,6 +141,14 @@ class SynchronousScrollSwipe extends Component {
                 this.scrollTop = correctedTop;
             }
         })
+    }
+
+    scrollToLeftStart() {
+        this.scrollTo(0, undefined)
+    }
+
+    scrollToTopStart() {
+        this.scrollTo(undefined, 0);
     }
 
     setActiveNode(e) {
@@ -184,6 +208,8 @@ class SynchronousScrollSwipe extends Component {
             this.autoScrollTracker = null;
         }
 
+        this.$listener.removeEventListener( 'mousemove', this.swipe );
+        this.$listener.removeEventListener( 'mouseup', this.end );
         this.$listener.addEventListener( 'mousemove', this.swipe, true );
         this.$listener.addEventListener( 'mouseup', this.end, true );
 
@@ -259,7 +285,7 @@ class SynchronousScrollSwipe extends Component {
         this.$listener.addEventListener( this.DETECT_EVT, this.setActiveNode, true );
         this.$listener.addEventListener( 'scroll', this.onScrollHandler, true );
 
-        if ( ! this.hasTouch ) {
+        if ( ! this.hasTouch && this.state.enableKinetic ) {
             this.$listener.addEventListener( 'mousedown', this.tap, true );
         }
     }
@@ -268,7 +294,7 @@ class SynchronousScrollSwipe extends Component {
         this.$listener.removeEventListener( this.DETECT_EVT, this.setActiveNode );
         this.$listener.removeEventListener( 'scroll', this.onScrollHandler );
 
-        if ( ! this.hasTouch ) {
+        if ( ! this.hasTouch && this.state.enableKinetic ) {
             this.$listener.removeEventListener( 'mousedown', this.tap );
         }
     }
@@ -302,7 +328,8 @@ SynchronousScrollSwipe.propTypes = {
     children: PropTypes.oneOfType([
         PropTypes.arrayOf(PropTypes.node),
         PropTypes.node
-    ])
+    ]),
+    options: PropTypes.object
 }
 
 export default SynchronousScrollSwipe;
