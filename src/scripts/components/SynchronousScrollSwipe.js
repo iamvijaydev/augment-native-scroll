@@ -76,7 +76,7 @@ class SynchronousScrollSwipe extends Component {
         var deltaY = 0, deltaX = 0, scrollX = 0, scrollY = 0;
         var timeConstant = 325;
 
-        elapsed = getTime() - this.timestamp;
+        elapsed = getTime() - this.timeStamp;
 
         if ( this.amplitudeTop ) {
             deltaY = -this.amplitudeTop * Math.exp(-elapsed / timeConstant);
