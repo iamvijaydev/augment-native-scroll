@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SynchronousScrollSwipe from './SynchronousScrollSwipe';
+import ConnectScrolls from './ConnectScrolls';
 import List from './List';
 import Table from './Table';
 import { generateData } from '../utils';
@@ -12,10 +12,10 @@ class App extends Component {
 
     render() {
         return (
-            <SynchronousScrollSwipe>
+            <ConnectScrolls>
                 <List data={this.state.list} />
                 <Table data={this.state.table} />
-            </SynchronousScrollSwipe>
+            </ConnectScrolls>
         );
     }
 }
